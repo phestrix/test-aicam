@@ -1,43 +1,85 @@
 package ru.phestrix.storage.domain;
 
-import java.time.LocalDate;
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.sql.*;
+
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Purchase {
-    private Long id;
-    private LocalDate dateOfPurchase;
-    private Customer customer;
-    private List<Good> purchasedGoods;
+    Connection connection;
 
-    public Long getId() {
-        return id;
+    private Integer id;
+    private Integer customerId;
+    private Integer goodId;
+    private Date date;
+
+    public void save() {
+        try {
+            PreparedStatement statement = connection.prepareStatement(
+                    "INSERT INTO purchases (customer_id, good_id, date)" + "VALUES (?,?,?)"
+            );
+            statement.setLong(1, customerId);
+            statement.setLong(2, goodId);
+            statement.setDate(3, date);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void update() {
+        try {
+            PreparedStatement statement = connection.prepareStatement(
+                    "UPDATE purchases SET customer_id = ?, good_id = ?, date = ? WHERE id = ?"
+            );
+            statement.setInt(1, customerId);
+            statement.setInt(2, goodId);
+            statement.setDate(3, new java.sql.Date(this.date.getTime()));
+            statement.setInt(4, id);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    public LocalDate getDateOfPurchase() {
-        return dateOfPurchase;
+    public void delete() {
+        try {
+            PreparedStatement statement = connection.prepareStatement(
+                    "DELETE FROM purchases WHERE id = ?"
+            );
+            statement.setInt(1, this.id);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void setDateOfPurchase(LocalDate dateOfPurchase) {
-        this.dateOfPurchase = dateOfPurchase;
-    }
-
-    public Customer getCustomer() {
-        return customer;
-    }
-
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
-    }
-
-    public List<Good> getPurchasedGoods() {
-        return purchasedGoods;
-    }
-
-    public void setPurchasedGoods(List<Good> purchasedGoods) {
-        this.purchasedGoods = purchasedGoods;
+    public Purchase loadById(Integer id) {
+        Purchase purchase = null;
+        try {
+            PreparedStatement statement = connection.prepareStatement(
+                    "SELECT * FROM purchases WHERE id = ?"
+            );
+            statement.setInt(1, id);
+            ResultSet result = statement.executeQuery();
+            if (result.next()) {
+                purchase = new Purchase();
+                purchase.setId(result.getInt("id"));
+                purchase.setCustomerId(result.getInt("customer_id"));
+                purchase.setGoodId(result.getInt("good_id"));
+                purchase.setDate(result.getDate("date"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return purchase;
     }
 }
+
