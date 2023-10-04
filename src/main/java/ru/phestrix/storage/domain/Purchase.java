@@ -23,7 +23,7 @@ public class Purchase {
     public void save() {
         try {
             PreparedStatement statement = connection.prepareStatement(
-                    "INSERT INTO purchases (customer_id, good_id, date)" + "VALUES (?,?,?)"
+                    "insert into purchases (customer_id, good_id, date)" + "values (?,?,?)"
             );
             statement.setLong(1, customerId);
             statement.setLong(2, goodId);
@@ -37,7 +37,7 @@ public class Purchase {
     public void update() {
         try {
             PreparedStatement statement = connection.prepareStatement(
-                    "UPDATE purchases SET customer_id = ?, good_id = ?, date = ? WHERE id = ?"
+                    "update purchases set customer_id = ?, good_id = ?, date = ? where id = ?"
             );
             statement.setInt(1, customerId);
             statement.setInt(2, goodId);
@@ -52,7 +52,7 @@ public class Purchase {
     public void delete() {
         try {
             PreparedStatement statement = connection.prepareStatement(
-                    "DELETE FROM purchases WHERE id = ?"
+                    "delete from purchases where id = ?"
             );
             statement.setInt(1, this.id);
             statement.executeUpdate();
@@ -65,7 +65,7 @@ public class Purchase {
         Purchase purchase = null;
         try {
             PreparedStatement statement = connection.prepareStatement(
-                    "SELECT * FROM purchases WHERE id = ?"
+                    "select * from purchases where id = ?"
             );
             statement.setInt(1, id);
             ResultSet result = statement.executeQuery();
