@@ -4,6 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.phestrix.exceptions.sql.CreateSQLException;
+import ru.phestrix.exceptions.sql.DeleteSQLException;
+import ru.phestrix.exceptions.sql.ReadSQLException;
+import ru.phestrix.exceptions.sql.UpdateSQLException;
 
 import java.sql.*;
 
@@ -20,7 +24,7 @@ public class Purchase {
     private Integer goodId;
     private Date date;
 
-    public void save() {
+    public void save() throws CreateSQLException {
         try {
             PreparedStatement statement = connection.prepareStatement(
                     "insert into purchases (customer_id, good_id, date)" + "values (?,?,?)"
@@ -30,11 +34,11 @@ public class Purchase {
             statement.setDate(3, date);
             statement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new CreateSQLException("failure with creation");
         }
     }
 
-    public void update() {
+    public void update() throws UpdateSQLException {
         try {
             PreparedStatement statement = connection.prepareStatement(
                     "update purchases set customer_id = ?, good_id = ?, date = ? where id = ?"
@@ -45,11 +49,11 @@ public class Purchase {
             statement.setInt(4, id);
             statement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new UpdateSQLException("failure with update");
         }
     }
 
-    public void delete() {
+    public void delete() throws DeleteSQLException {
         try {
             PreparedStatement statement = connection.prepareStatement(
                     "delete from purchases where id = ?"
@@ -57,11 +61,11 @@ public class Purchase {
             statement.setInt(1, this.id);
             statement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DeleteSQLException("failure with deletion");
         }
     }
 
-    public Purchase loadById(Integer id) {
+    public Purchase loadById(Integer id) throws ReadSQLException {
         Purchase purchase = null;
         try {
             PreparedStatement statement = connection.prepareStatement(
@@ -77,7 +81,7 @@ public class Purchase {
                 purchase.setDate(result.getDate("date"));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new ReadSQLException("failure with reading");
         }
         return purchase;
     }

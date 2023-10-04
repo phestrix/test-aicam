@@ -2,6 +2,10 @@ package ru.phestrix.storage.domain;
 
 
 import lombok.*;
+import ru.phestrix.exceptions.sql.CreateSQLException;
+import ru.phestrix.exceptions.sql.DeleteSQLException;
+import ru.phestrix.exceptions.sql.ReadSQLException;
+import ru.phestrix.exceptions.sql.UpdateSQLException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,7 +22,7 @@ public class Good {
     private String name;
     private Integer price;
 
-    public void update() {
+    public void update() throws UpdateSQLException {
         try {
             PreparedStatement statement = connection.prepareStatement(
                     "update good set name = ?, price = ? where id = ?"
@@ -28,11 +32,11 @@ public class Good {
             statement.setInt(3, id);
             statement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new UpdateSQLException("failure with update");
         }
     }
 
-    public void save() {
+    public void save() throws CreateSQLException {
         try {
             PreparedStatement statement = connection.prepareStatement(
                     "insert into good (name, price) VALUES (?,?)"
@@ -41,11 +45,11 @@ public class Good {
             statement.setInt(2, price);
             statement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new CreateSQLException("failure with creation");
         }
     }
 
-    public Good getGoodById() {
+    public Good getGoodById() throws ReadSQLException {
         Good good = null;
         try {
             PreparedStatement statement = connection.prepareStatement(
@@ -61,12 +65,12 @@ public class Good {
 
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new ReadSQLException("failure with reading");
         }
         return good;
     }
 
-    public void delete() {
+    public void delete() throws DeleteSQLException {
         try {
             PreparedStatement statement = connection.prepareStatement(
                     "delete from good where id = ?"
@@ -74,7 +78,7 @@ public class Good {
             statement.setInt(1, id);
             statement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DeleteSQLException("failure with deletion");
         }
     }
 }

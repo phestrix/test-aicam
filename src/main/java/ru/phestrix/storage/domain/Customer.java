@@ -4,6 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.phestrix.exceptions.sql.CreateSQLException;
+import ru.phestrix.exceptions.sql.DeleteSQLException;
+import ru.phestrix.exceptions.sql.ReadSQLException;
+import ru.phestrix.exceptions.sql.UpdateSQLException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,7 +24,7 @@ public class Customer {
     private String name;
     private String surname;
 
-    public void update() {
+    public void update() throws UpdateSQLException {
         try {
             PreparedStatement statement = connection.prepareStatement(
                     "update customer set name = ?, surname = ? where id = ?"
@@ -30,11 +34,11 @@ public class Customer {
             statement.setInt(3, id);
             statement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new UpdateSQLException("failure with update");
         }
     }
 
-    public void save() {
+    public void save() throws CreateSQLException {
         try {
             PreparedStatement statement = connection.prepareStatement(
                     "insert into customer (name, surname) VALUES (?,?)"
@@ -43,11 +47,11 @@ public class Customer {
             statement.setString(2, surname);
             statement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new CreateSQLException("failure with creation");
         }
     }
 
-    public Customer getGoodById() {
+    public Customer getGoodById() throws ReadSQLException {
         Customer customer = null;
         try {
             PreparedStatement statement = connection.prepareStatement(
@@ -63,12 +67,12 @@ public class Customer {
 
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new ReadSQLException("failure with reading");
         }
         return customer;
     }
 
-    public void delete() {
+    public void delete() throws DeleteSQLException {
         try {
             PreparedStatement statement = connection.prepareStatement(
                     "delete from customer where id = ?"
@@ -76,7 +80,7 @@ public class Customer {
             statement.setInt(1, id);
             statement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DeleteSQLException("failure with deletion");
         }
     }
 }
