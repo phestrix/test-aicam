@@ -51,7 +51,7 @@ public class Customer {
         }
     }
 
-    public Customer getGoodById() throws ReadSQLException {
+    public Customer getCustomerById() throws ReadSQLException {
         Customer customer = null;
         try {
             PreparedStatement statement = connection.prepareStatement(
