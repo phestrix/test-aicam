@@ -65,7 +65,7 @@ public class Purchase {
         }
     }
 
-    public Purchase loadById(Integer id) throws ReadSQLException {
+    public Purchase getPurchaseById() throws ReadSQLException {
         Purchase purchase = null;
         try {
             PreparedStatement statement = connection.prepareStatement(
