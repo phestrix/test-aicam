@@ -7,6 +7,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Optional;
 
 public class PurchaseRepository {
@@ -76,5 +78,21 @@ public class PurchaseRepository {
             e.printStackTrace();
         }
         return purchase;
+    }
+
+    public ArrayList<Integer> findCustomersIdWhoHasGoodIdSomeTimes(Integer goodId, Integer count){
+        ArrayList<Integer> customerIdArray = new ArrayList<>();
+        try{
+            PreparedStatement statement = connection.prepareStatement(
+                    "select customer_id from purchase where good_id = ? having count(purchase.id)>=?"
+            );
+            statement.setInt(1, goodId);
+            statement.setInt(2, count);
+            ResultSet resultSet = statement.executeQuery();
+            ArrayList<Integer> customerIdList = (ArrayList<Integer>) resultSet.getArray("customer_id");
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return customerIdArray;
     }
 }
