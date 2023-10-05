@@ -80,6 +80,7 @@ public class Purchase {
                 purchase.setGoodId(result.getInt("good_id"));
                 purchase.setDate(result.getDate("date"));
             }
+            result.close();
         } catch (SQLException e) {
             throw new ReadSQLException("failure with reading");
         }

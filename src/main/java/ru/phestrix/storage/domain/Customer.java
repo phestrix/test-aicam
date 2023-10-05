@@ -66,6 +66,7 @@ public class Customer {
                 customer.setSurname(result.getString("surname"));
 
             }
+            result.close();
         } catch (SQLException e) {
             throw new ReadSQLException("failure with reading");
         }

@@ -64,6 +64,7 @@ public class Good {
                 good.setPrice(result.getInt("price"));
 
             }
+            result.close();
         } catch (SQLException e) {
             throw new ReadSQLException("failure with reading");
         }
