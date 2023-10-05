@@ -72,6 +72,7 @@ public class CustomerRepository {
                     "select * from customer where surname = ?"
             );
             statement.setString(1, surname);
+
             createOptionalCustomerFromResultSet(customer, statement);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -80,7 +81,7 @@ public class CustomerRepository {
     }
 
     private void createOptionalCustomerFromResultSet(Optional<Customer> customer, PreparedStatement statement) throws SQLException {
-        ResultSet resultSet = statement.getResultSet();
+        ResultSet resultSet = statement.executeQuery();
         customer.ifPresent(it -> {
             try {
                 it.setId(resultSet.getInt("id"));
