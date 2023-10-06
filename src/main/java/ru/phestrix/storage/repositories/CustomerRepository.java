@@ -7,6 +7,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class CustomerRepository {
@@ -65,19 +67,29 @@ public class CustomerRepository {
         return customer;
     }
 
-    public Optional<Customer> findBySurname(String surname) {
-        Optional<Customer> customer = Optional.of(new Customer());
+    public List<Customer> findBySurname(String surname) {
+        List<Customer> customers = new ArrayList<>();
         try {
             PreparedStatement statement = connection.prepareStatement(
                     "select * from customer where surname = ?"
             );
             statement.setString(1, surname);
 
-            createOptionalCustomerFromResultSet(customer, statement);
+            try {
+                ResultSet resultSet = statement.executeQuery();
+                while (resultSet.next()) {
+                    customers.add(new Customer(
+                            resultSet.getInt("id"),
+                            resultSet.getString("name"),
+                            resultSet.getString("surname")));
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return customer;
+        return customers;
     }
 
     private void createOptionalCustomerFromResultSet(Optional<Customer> customer, PreparedStatement statement) throws SQLException {
