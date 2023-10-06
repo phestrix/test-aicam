@@ -118,4 +118,23 @@ public class CustomerRepository {
         }
         return listOfCustomerIds;
     }
+
+    public List<Integer> findCustomerIdsWithMinQuantityOfPurchases(Integer countOfCustomers){
+        List<Integer> listOfCustomerIds = new ArrayList<>();
+        try{
+            PreparedStatement statement = connection.prepareStatement(
+                    "select customer_id from customer" +
+                            " inner join purchase on customer.id = purchase.customer_id" +
+                            " group by customer_id" +
+                            " order by count(purchase.id) asc" +
+                            " limit ?"
+            );
+            statement.setInt(1, countOfCustomers);
+            ResultSet resultSet = statement.executeQuery();
+            listOfCustomerIds.addAll((Collection<? extends Integer>) resultSet.getArray("id"));
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return listOfCustomerIds;
+    }
 }
