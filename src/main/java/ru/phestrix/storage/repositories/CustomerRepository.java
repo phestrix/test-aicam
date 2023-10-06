@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,14 +54,19 @@ public class CustomerRepository {
         }
     }
 
-    public Optional<Customer> findById(Integer id) {
-        Optional<Customer> customer = Optional.of(new Customer());
+    public Customer findById(Integer id) {
+        Customer customer = null;
         try {
             PreparedStatement statement = connection.prepareStatement(
                     "select * from customer where id = ?"
             );
             statement.setInt(1, id);
-            createOptionalCustomerFromResultSet(customer, statement);
+            ResultSet resultSet = statement.executeQuery();
+            customer = new Customer(
+                    resultSet.getInt("id"),
+                    resultSet.getString("name"),
+                    resultSet.getString("surname")
+            );
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -92,18 +98,24 @@ public class CustomerRepository {
         return customers;
     }
 
-    private void createOptionalCustomerFromResultSet(Optional<Customer> customer, PreparedStatement statement) throws SQLException {
-        ResultSet resultSet = statement.executeQuery();
-        customer.ifPresent(it -> {
-            try {
-                it.setId(resultSet.getInt("id"));
-                it.setName(resultSet.getString("name"));
-                it.setSurname(resultSet.getString("surname"));
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        });
 
-        resultSet.close();
+    public List<Integer> findCustomersIdWithCostOfBuysInInterval(Integer minCost, Integer maxCost) {
+        List<Integer> listOfCustomerIds = new ArrayList<>();
+        try{
+            PreparedStatement statement = connection.prepareStatement(
+                    "select customer_id from customer" +
+                            " inner join purchase p on customer.id = p.customer_id" +
+                            " inner join good g on p.good_id = g.id" +
+                            " group by customer_id" +
+                            " having sum(g.price)>=? and sum(g.price)<=?"
+            );
+            statement.setInt(1, minCost);
+            statement.setInt(2, maxCost);
+            ResultSet resultSet = statement.executeQuery();
+            listOfCustomerIds.addAll((Collection<? extends Integer>) resultSet.getArray("id"));
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return listOfCustomerIds;
     }
 }
