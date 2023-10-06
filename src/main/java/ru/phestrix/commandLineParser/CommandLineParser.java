@@ -3,7 +3,6 @@ package ru.phestrix.commandLineParser;
 import java.util.Objects;
 
 public class CommandLineParser {
-
     public static String parseArgs(String[] args) {
         if (args.length != 3) {
             return "Bad number of arguments";
