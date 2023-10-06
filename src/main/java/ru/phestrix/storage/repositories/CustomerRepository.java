@@ -99,8 +99,8 @@ public class CustomerRepository {
     }
 
 
-    public List<Integer> findCustomersIdWithCostOfBuysInInterval(Integer minCost, Integer maxCost) {
-        List<Integer> listOfCustomerIds = new ArrayList<>();
+    public ArrayList<Integer> findCustomersIdWithCostOfBuysInInterval(Integer minCost, Integer maxCost) {
+        ArrayList<Integer> listOfCustomerIds = new ArrayList<>();
         try{
             PreparedStatement statement = connection.prepareStatement(
                     "select customer_id from customer" +
@@ -119,8 +119,8 @@ public class CustomerRepository {
         return listOfCustomerIds;
     }
 
-    public List<Integer> findCustomerIdsWithMinQuantityOfPurchases(Integer countOfCustomers){
-        List<Integer> listOfCustomerIds = new ArrayList<>();
+    public ArrayList<Integer> findCustomerIdsWithMinQuantityOfPurchases(Integer countOfCustomers){
+        ArrayList<Integer> listOfCustomerIds = new ArrayList<>();
         try{
             PreparedStatement statement = connection.prepareStatement(
                     "select customer_id from customer" +
