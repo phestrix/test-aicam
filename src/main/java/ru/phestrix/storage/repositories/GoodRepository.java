@@ -75,4 +75,19 @@ public class GoodRepository {
             e.printStackTrace();
         }
     }
+
+    public Integer findGoodIdByName(String goodName) {
+        Integer id = -1;
+        try {
+            PreparedStatement statement = connection.prepareStatement(
+                    "select * from good where name = ?"
+            );
+            statement.setString(1, goodName);
+            ResultSet resultSet = statement.executeQuery();
+            id = resultSet.getInt("id");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return id;
+    }
 }
