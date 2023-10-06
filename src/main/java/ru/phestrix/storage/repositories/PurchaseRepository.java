@@ -8,7 +8,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Optional;
 
 public class PurchaseRepository {
@@ -80,7 +79,7 @@ public class PurchaseRepository {
         return purchase;
     }
 
-    public ArrayList<Integer> findCustomersIdWhoHasGoodIdSomeTimes(Integer goodId, Integer count){
+    public ArrayList<Integer> findCustomersIdWhoHasGoodIdCountTimes(Integer goodId, Integer count){
         ArrayList<Integer> customerIdArray = new ArrayList<>();
         try{
             PreparedStatement statement = connection.prepareStatement(
