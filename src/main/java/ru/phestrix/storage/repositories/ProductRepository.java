@@ -1,91 +1,85 @@
 package ru.phestrix.storage.repositories;
 
 import ru.phestrix.storage.databaseConnection.DatabaseConnection;
-import ru.phestrix.storage.entity.Good;
+import ru.phestrix.storage.entity.Product;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Optional;
 
-public class GoodRepository {
+public class ProductRepository {
     private Connection connection = DatabaseConnection.getConnection();
 
-    public void update(Good good) {
+    public void update(Product product) {
         try {
             PreparedStatement statement = connection.prepareStatement(
-                    "update good set name = ?, price = ? where id = ?"
+                    "update product set name = ?, price = ? where id = ?"
             );
-            statement.setString(1, good.getName());
-            statement.setInt(2, good.getPrice());
-            statement.setInt(3, good.getId());
+            statement.setString(1, product.getName());
+            statement.setInt(2, product.getPrice());
+            statement.setInt(3, product.getId());
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public void save(Good good) {
+    public void save(Product product) {
         try {
             PreparedStatement statement = connection.prepareStatement(
-                    "insert into good (name, price) VALUES (?,?)"
+                    "insert into product (name, price) VALUES (?,?)"
             );
-            statement.setString(1, good.getName());
-            statement.setInt(2, good.getPrice());
+            statement.setString(1, product.getName());
+            statement.setInt(2, product.getPrice());
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public Optional<Good> getGoodById(Integer id) {
-        Optional<Good> good = Optional.of(new Good());
+    public Product getProductById(Integer id) {
+        Product product = new Product();
         try {
             PreparedStatement statement = connection.prepareStatement(
-                    "select * from good where id = ?"
+                    "select * from product where id = ?"
             );
             statement.setInt(1, id);
             ResultSet result = statement.executeQuery();
-
-            good.ifPresent(it -> {
-                try {
-                    it.setId(result.getInt("id"));
-                    it.setName(result.getString("name"));
-                    it.setPrice(result.getInt("price"));
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            });
+            result.next();
+            product.setId(result.getInt("id"));
+            product.setName(result.getString("name"));
+            product.setPrice(result.getInt("price"));
             result.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return good;
+        return product;
     }
 
-    public void delete(Good good) {
+    public void delete(Product product) {
         try {
             PreparedStatement statement = connection.prepareStatement(
-                    "delete from good where id = ?"
+                    "delete from product where id = ?"
             );
-            statement.setInt(1, good.getId());
+            statement.setInt(1, product.getId());
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public Integer findGoodIdByName(String goodName) {
+    public Integer findProductIdByName(String goodName) {
         Integer id = -1;
         try {
             PreparedStatement statement = connection.prepareStatement(
-                    "select good.id from good where name = ?"
+                    "select product.id from product where name = ?"
             );
             statement.setString(1, goodName);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next())
                 id = resultSet.getInt("id");
+            resultSet.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
