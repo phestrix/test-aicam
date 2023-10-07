@@ -1,29 +1,39 @@
 package ru.phestrix.jsonParser;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
+import ru.phestrix.dto.CustomerDto;
+import ru.phestrix.jsonParser.utility.CriteriaType;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
+import static ru.phestrix.jsonParser.utility.CriteriaType.*;
 
 public class JSONParser {
-    private final String inputPath;
-    private final String outputPath;
-    private FileWriter fileWriter;
 
-    public JSONParser(String input, String output) {
-        inputPath = input;
-        outputPath = output;
+    private FileWriter outputWriter;
+    private final JSONObject finalObject = new JSONObject();
+    private final JSONArray results = new JSONArray();
+
+    public JSONParser(String output) {
+        try {
+
+            outputWriter = new FileWriter(output);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public List<JSONObject> getJsonFromFile() {
+    public List<JSONObject> getJsonFromFile(String inputPath) {
         try {
-            String strToParse = new String(Files.readAllBytes(Paths.get(inputPath)));
+            String strToParse = new String(Files
+                    .readAllBytes(
+                            Paths.get(inputPath)), StandardCharsets.UTF_8);
             JSONObject jsonObject = new JSONObject(strToParse);
             Map<String, Object> map = jsonObject.toMap();
             Set<String> set = map.keySet();
@@ -47,9 +57,7 @@ public class JSONParser {
         out.put("type", "error");
         out.put("message", message);
         try {
-            fileWriter = new FileWriter(outputPath);
-            fileWriter.write(out.toString());
-            fileWriter.close();
+            outputWriter.write(out.toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -74,5 +82,77 @@ public class JSONParser {
         return statList;
     }
 
+    public CriteriaType parseCriteria(JSONObject object) {
+        Map<String, Object> map = object.toMap();
+        Set<String> set = map.keySet();
+        if (set.size() == 1) {
+            return parseSingleParameterCriteria(set);
+        }
+        if (set.size() == 2) {
+            return parseDoubleParameterCriteria(set);
+        } else {
+            return UNSUPPORTED_CRITERIA;
+        }
+    }
 
+    private CriteriaType parseSingleParameterCriteria(Set<String> set) {
+        if (set.contains("lastName")) {
+            return LASTNAME;
+        }
+        if (set.contains("badCustomers")) {
+            return BAD_CUSTOMERS;
+        } else {
+            return UNSUPPORTED_SINGLE_TYPE;
+        }
+    }
+
+    private CriteriaType parseDoubleParameterCriteria(Set<String> set) {
+        if (set.contains("productName") && set.contains("minTimes"))
+            return PRODUCT_COUNT;
+        else if (set.contains("minExpenses") && set.contains("maxExpenses"))
+            return MIN_MAX_EXPENSES;
+        else if (set.contains("startDate") && set.contains("endDate"))
+            return DATES;
+        return UNSUPPORTED_DOUBLE_TYPE;
+    }
+
+    public void writeHeader(String head) {
+        finalObject.put("type", head);
+    }
+
+    public void writeCriteria(JSONObject object) {
+        JSONObject criteria = new JSONObject();
+        criteria.put("criteria", object);
+        results.put(criteria);
+    }
+
+    public void writeDtoList(ArrayList<CustomerDto> list) {
+        JSONArray array = new JSONArray();
+        for (CustomerDto customerDto : list) {
+            JSONObject object = new JSONObject();
+            object.put("lastName", customerDto.getLastname());
+            object.put("firstName", customerDto.getName());
+            array.put(object);
+        }
+        JSONObject result = new JSONObject();
+        result.put("results", array);
+        results.put(result);
+    }
+
+    public void write() {
+        try {
+            finalObject.put("results", results);
+            outputWriter.write(finalObject.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void closeWriter() {
+        try {
+            outputWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
