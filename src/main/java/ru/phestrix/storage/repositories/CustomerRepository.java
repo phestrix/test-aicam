@@ -62,11 +62,12 @@ public class CustomerRepository {
             );
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
-            customer = new Customer(
-                    resultSet.getInt("id"),
-                    resultSet.getString("name"),
-                    resultSet.getString("surname")
-            );
+            if (resultSet.next())
+                customer = new Customer(
+                        resultSet.getInt("id"),
+                        resultSet.getString("name"),
+                        resultSet.getString("surname")
+                );
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -101,7 +102,7 @@ public class CustomerRepository {
 
     public ArrayList<Integer> findCustomersIdWithCostOfBuysInInterval(Integer minCost, Integer maxCost) {
         ArrayList<Integer> listOfCustomerIds = new ArrayList<>();
-        try{
+        try {
             PreparedStatement statement = connection.prepareStatement(
                     "select customer_id from customer" +
                             " inner join purchase p on customer.id = p.customer_id" +
@@ -112,16 +113,18 @@ public class CustomerRepository {
             statement.setInt(1, minCost);
             statement.setInt(2, maxCost);
             ResultSet resultSet = statement.executeQuery();
-            listOfCustomerIds.addAll((Collection<? extends Integer>) resultSet.getArray("id"));
-        }catch (SQLException e){
+            while (resultSet.next()) {
+                listOfCustomerIds.add(resultSet.getInt("customer_id"));
+            }
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return listOfCustomerIds;
     }
 
-    public ArrayList<Integer> findCustomerIdsWithMinQuantityOfPurchases(Integer countOfCustomers){
+    public ArrayList<Integer> findCustomerIdsWithMinQuantityOfPurchases(Integer countOfCustomers) {
         ArrayList<Integer> listOfCustomerIds = new ArrayList<>();
-        try{
+        try {
             PreparedStatement statement = connection.prepareStatement(
                     "select customer_id from customer" +
                             " inner join purchase on customer.id = purchase.customer_id" +
@@ -131,8 +134,10 @@ public class CustomerRepository {
             );
             statement.setInt(1, countOfCustomers);
             ResultSet resultSet = statement.executeQuery();
-            listOfCustomerIds.addAll((Collection<? extends Integer>) resultSet.getArray("id"));
-        }catch (SQLException e){
+            while (resultSet.next()) {
+                listOfCustomerIds.add(resultSet.getInt("customer_id"));
+            }
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return listOfCustomerIds;

@@ -80,11 +80,12 @@ public class GoodRepository {
         Integer id = -1;
         try {
             PreparedStatement statement = connection.prepareStatement(
-                    "select * from good where name = ?"
+                    "select good.id from good where name = ?"
             );
             statement.setString(1, goodName);
             ResultSet resultSet = statement.executeQuery();
-            id = resultSet.getInt("id");
+            if (resultSet.next())
+                id = resultSet.getInt("id");
         } catch (SQLException e) {
             e.printStackTrace();
         }

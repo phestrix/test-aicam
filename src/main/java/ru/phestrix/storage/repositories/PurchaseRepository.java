@@ -54,24 +54,21 @@ public class PurchaseRepository {
         }
     }
 
-    public Optional<Purchase> getPurchaseById(Integer id) {
-        Optional<Purchase> purchase = Optional.of(new Purchase());
+    public Purchase getPurchaseById(Integer id) {
+        Purchase purchase = new Purchase();
         try {
             PreparedStatement statement = connection.prepareStatement(
                     "select * from purchase where id = ?"
             );
             statement.setInt(1, id);
             ResultSet result = statement.executeQuery();
-            purchase.ifPresent(it -> {
-                try {
-                    it.setId(result.getInt("id"));
-                    it.setCustomerId(result.getInt("customer_id"));
-                    it.setGoodId(result.getInt("good_id"));
-                    it.setDate(result.getDate("date"));
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            });
+            if (result.next()) {
+                purchase.setId(result.getInt("id"));
+                purchase.setCustomerId(result.getInt("customer_id"));
+                purchase.setGoodId(result.getInt("good_id"));
+                purchase.setDate(result.getDate("date"));
+
+            }
             result.close();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -79,17 +76,23 @@ public class PurchaseRepository {
         return purchase;
     }
 
-    public ArrayList<Integer> findCustomersIdWhoHasGoodIdCountTimes(Integer goodId, Integer count){
+    public ArrayList<Integer> findCustomersIdWhoHasGoodIdCountTimes(Integer goodId, Integer count) {
         ArrayList<Integer> customerIdArray = new ArrayList<>();
-        try{
+        try {
             PreparedStatement statement = connection.prepareStatement(
-                    "select customer_id from purchase where good_id = ? having count(purchase.id)>=?"
+                    "select name, surname from customer where " +
+                            "id in (select customer_id from (select count(customer_id) as count, " +
+                            "customer_id from purchase where good_id " +
+                            "= (select id from good where id = ?) " +
+                            "group by customer_id) as sub where count > ?)"
             );
             statement.setInt(1, goodId);
             statement.setInt(2, count);
             ResultSet resultSet = statement.executeQuery();
-            ArrayList<Integer> customerIdList = (ArrayList<Integer>) resultSet.getArray("customer_id");
-        }catch (SQLException e){
+            while (resultSet.next()) {
+                customerIdArray.add(resultSet.getInt("id"));
+            }
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return customerIdArray;
