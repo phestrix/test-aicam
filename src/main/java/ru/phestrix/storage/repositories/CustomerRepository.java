@@ -8,9 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 public class CustomerRepository {
     private final Connection connection = DatabaseConnection.getConnection();
@@ -68,6 +66,7 @@ public class CustomerRepository {
                         resultSet.getString("name"),
                         resultSet.getString("surname")
                 );
+            resultSet.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -90,6 +89,7 @@ public class CustomerRepository {
                             resultSet.getString("name"),
                             resultSet.getString("surname")));
                 }
+                resultSet.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -106,7 +106,7 @@ public class CustomerRepository {
             PreparedStatement statement = connection.prepareStatement(
                     "select customer_id from customer" +
                             " inner join purchase p on customer.id = p.customer_id" +
-                            " inner join good g on p.good_id = g.id" +
+                            " inner join product g on p.product_id = g.id" +
                             " group by customer_id" +
                             " having sum(g.price)>=? and sum(g.price)<=?"
             );
@@ -116,6 +116,7 @@ public class CustomerRepository {
             while (resultSet.next()) {
                 listOfCustomerIds.add(resultSet.getInt("customer_id"));
             }
+            resultSet.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -129,7 +130,7 @@ public class CustomerRepository {
                     "select customer_id from customer" +
                             " inner join purchase on customer.id = purchase.customer_id" +
                             " group by customer_id" +
-                            " order by count(purchase.id) asc" +
+                            " order by count(purchase.id)" +
                             " limit ?"
             );
             statement.setInt(1, countOfCustomers);
@@ -137,6 +138,7 @@ public class CustomerRepository {
             while (resultSet.next()) {
                 listOfCustomerIds.add(resultSet.getInt("customer_id"));
             }
+            resultSet.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }

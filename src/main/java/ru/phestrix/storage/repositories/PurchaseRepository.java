@@ -16,7 +16,7 @@ public class PurchaseRepository {
     public void save(Purchase purchase) {
         try {
             PreparedStatement statement = connection.prepareStatement(
-                    "insert into purchase (customer_id, good_id, date)" + "values (?,?,?)"
+                    "insert into purchase (customer_id, product_id, date)" + "values (?,?,?)"
             );
             statement.setLong(1, purchase.getCustomerId());
             statement.setLong(2, purchase.getGoodId());
@@ -30,7 +30,7 @@ public class PurchaseRepository {
     public void update(Purchase purchase) {
         try {
             PreparedStatement statement = connection.prepareStatement(
-                    "update purchase set customer_id = ?, good_id = ?, date = ? where id = ?"
+                    "update purchase set customer_id = ?, product_id = ?, date = ? where id = ?"
             );
             statement.setInt(1, purchase.getCustomerId());
             statement.setInt(2, purchase.getGoodId());
@@ -82,8 +82,8 @@ public class PurchaseRepository {
             PreparedStatement statement = connection.prepareStatement(
                     "select name, surname from customer where " +
                             "id in (select customer_id from (select count(customer_id) as count, " +
-                            "customer_id from purchase where good_id " +
-                            "= (select id from good where id = ?) " +
+                            "customer_id from purchase where product_id " +
+                            "= (select id from product where id = ?) " +
                             "group by customer_id) as sub where count > ?)"
             );
             statement.setInt(1, goodId);
@@ -92,6 +92,7 @@ public class PurchaseRepository {
             while (resultSet.next()) {
                 customerIdArray.add(resultSet.getInt("id"));
             }
+            resultSet.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
