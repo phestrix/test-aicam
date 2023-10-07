@@ -1,14 +1,11 @@
 package ru.phestrix.storage.repositories;
 
+import ru.phestrix.dto.StatDto;
 import ru.phestrix.storage.databaseConnection.DatabaseConnection;
 import ru.phestrix.storage.entity.Purchase;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
-import java.util.Optional;
 
 public class PurchaseRepository {
     private final Connection connection = DatabaseConnection.getConnection();
@@ -97,5 +94,79 @@ public class PurchaseRepository {
             e.printStackTrace();
         }
         return customerIdArray;
+    }
+
+    public Integer findTotalExpensesByCustomer(Integer customerId) {
+        Integer total = 0;
+        try {
+            PreparedStatement statement = connection.prepareStatement(
+                    "select sum(p.price) from customer c " +
+                            "join purchase pu on c.id = pu.customer_id " +
+                            "join product p on pu.product_id = p.id " +
+                            "where c.id = ?"
+            );
+            statement.setInt(1, customerId);
+            ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
+            total = resultSet.getInt("sum");
+            resultSet.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return total;
+    }
+
+    public Double findAverageExpenses() {
+        Double avg = 0.0;
+        try {
+            PreparedStatement statement = connection.prepareStatement(
+                    "select c.name, c.surname, AVG(p.price) as average_expenses\n" +
+                            "from customer c " +
+                            "join purchase pu ON c.id = pu.customer_id " +
+                            "join product p ON pu.product_id = p.id " +
+                            "group by c.id"
+            );
+
+            ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
+            avg = resultSet.getDouble("average_expenses");
+            resultSet.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return avg;
+    }
+
+    public ArrayList<StatDto> getStatistic(Date startDate, Date endDate) {
+        ArrayList<StatDto> statDtos = new ArrayList<>();
+        try {
+            PreparedStatement statement = connection.prepareStatement(
+                    "select c.surname || ' ' || c.name as fullName, p.name as productName, " +
+                            "count(sub.product_id) * p.price as expenses from " +
+                            "(select * from purchase where date between ? and ? and extract(dow from (5,6))" +
+                            "and customer_id in (select id from customer) order by product_id) as sub " +
+                            "join product p on sub.product_id = p.id join customer c on sub.customer_id = c.id " +
+                            "group by p.name, p.price, sub.customer_id, c.name, c.surname, sub.product_id " +
+                            "order by expenses desc;"
+
+            );
+            statement.setDate(1, startDate);
+            statement.setDate(2, endDate);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                statDtos.add(
+                        new StatDto(
+                                resultSet.getString("fullName"),
+                                resultSet.getString("productName"),
+                                resultSet.getInt("expenses")
+                        )
+                );
+            }
+
+            resultSet.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return statDtos;
     }
 }
