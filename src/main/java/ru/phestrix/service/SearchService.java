@@ -1,9 +1,11 @@
 package ru.phestrix.service;
 
+import ru.phestrix.dto.CustomerDto;
+import ru.phestrix.dtoProducer.CustomerDtoProducer;
 import ru.phestrix.storage.databaseConnection.DatabaseConnection;
 import ru.phestrix.storage.entity.Customer;
 import ru.phestrix.storage.repositories.CustomerRepository;
-import ru.phestrix.storage.repositories.GoodRepository;
+import ru.phestrix.storage.repositories.ProductRepository;
 import ru.phestrix.storage.repositories.PurchaseRepository;
 
 import java.sql.Connection;
@@ -11,64 +13,74 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SearchService {
-    private Connection connection = DatabaseConnection.getConnection();
-    CustomerRepository customerRepository;
-    GoodRepository goodRepository;
-    PurchaseRepository purchaseRepository;
+    private final Connection connection = DatabaseConnection.getConnection();
+    private final CustomerRepository customerRepository = new CustomerRepository();
+    private final ProductRepository productRepository = new ProductRepository();
+    private final PurchaseRepository purchaseRepository = new PurchaseRepository();
 
-    public void search(String surname,
-                       String goodName,
-                       Integer countOfGood,
-                       Integer minCost,
-                       Integer maxCost,
-                       Integer countOfBadCustomers) {
-        searchBySurname(surname);
-        searchGoodNameWithCountTimes(goodName, countOfGood);
-        searchCustomersInInterval(minCost, maxCost);
-        searchCustomersWithMinimumPurchases(countOfBadCustomers);
-    }
 
-    private void searchBySurname(String surname) {
+    public ArrayList<CustomerDto> searchByLastname(String surname) {
+        ArrayList<CustomerDto> customerDtos = new ArrayList<>();
         if (!surname.isEmpty()) {
             List<Customer> customerList = customerRepository.findBySurname(surname);
-            if (!customerList.isEmpty()) {
-                //TODO send list to json writer
+            if (customerList.isEmpty()) {
+                return null;
+            }
+            for (Customer customer : customerList) {
+                customerDtos.add(CustomerDtoProducer.makeCustomerDto(customer));
             }
         }
+        return customerDtos;
     }
 
-    private void searchGoodNameWithCountTimes(String goodName, Integer countOfGood) {
-        if (!goodName.isEmpty() && countOfGood < Integer.MAX_VALUE && countOfGood > 0) {
-            Integer goodId = goodRepository.findGoodIdByName(goodName);
-            if (goodId == -1) {
-                return;
-            }
-            List<Integer> customerList = purchaseRepository.
-                    findCustomersIdWhoHasGoodIdCountTimes(goodId, countOfGood);
-
+    public ArrayList<CustomerDto> searchProductNameWithCountTimes(String goodName, Integer countOfGood) {
+        if (goodName.isEmpty() || countOfGood == Integer.MAX_VALUE || countOfGood < 0) return null;
+        Integer goodId = productRepository.findProductIdByName(goodName);
+        if (goodId == -1) {
+            return null;
         }
-    }
-
-    private void searchCustomersInInterval(Integer minCost, Integer maxCost) {
-        if (minCost < Integer.MAX_VALUE && maxCost > 0) {
-            List<Integer> listOfCustomerIds = customerRepository.
-                    findCustomersIdWithCostOfBuysInInterval(minCost, maxCost);
-            if (listOfCustomerIds.isEmpty()) return;
-            ArrayList<Customer> customers = new ArrayList<>();
-            for (Integer id : listOfCustomerIds) {
-                customers.add(customerRepository.findById(id));
-            }
+        List<Integer> customerList = purchaseRepository.
+                findCustomersIdWhoHasGoodIdCountTimes(goodId, countOfGood);
+        ArrayList<CustomerDto> customerDtos = new ArrayList<>();
+        for (Integer id : customerList) {
+            customerDtos.add(
+                    CustomerDtoProducer
+                            .makeCustomerDto(customerRepository.findById(id)
+                            )
+            );
         }
+        return customerDtos;
     }
 
-    private void searchCustomersWithMinimumPurchases(Integer countOfBadCustomers) {
-        if (countOfBadCustomers == Integer.MAX_VALUE) return;
+    public ArrayList<CustomerDto> searchCustomersInInterval(Integer minCost, Integer maxCost) {
+        if (minCost == Integer.MAX_VALUE || maxCost < 0) return null;
+        List<Integer> listOfCustomerIds = customerRepository.
+                findCustomersIdWithCostOfBuysInInterval(minCost, maxCost);
+        if (listOfCustomerIds.isEmpty()) return null;
+        ArrayList<CustomerDto> customers = new ArrayList<>();
+        for (Integer id : listOfCustomerIds) {
+            customers.add(CustomerDtoProducer
+                    .makeCustomerDto(
+                            customerRepository.findById(id)
+                    )
+            );
+        }
+        return customers;
+    }
+
+    public ArrayList<CustomerDto> searchCustomersWithMinimumPurchases(Integer countOfBadCustomers) {
+        if (countOfBadCustomers == Integer.MAX_VALUE) return null;
         ArrayList<Integer> listOfCustomerIds = customerRepository.
                 findCustomerIdsWithMinQuantityOfPurchases(countOfBadCustomers);
-        if (listOfCustomerIds.isEmpty()) return;
-        ArrayList<Customer> customers = new ArrayList<>();
+        if (listOfCustomerIds.isEmpty()) return null;
+        ArrayList<CustomerDto> customers = new ArrayList<>();
         for (Integer id : listOfCustomerIds) {
-            customers.add(customerRepository.findById(id));
+            customers.add(CustomerDtoProducer
+                    .makeCustomerDto(
+                            customerRepository.findById(id)
+                    )
+            );
         }
+        return customers;
     }
 }
