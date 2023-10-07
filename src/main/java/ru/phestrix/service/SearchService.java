@@ -2,13 +2,11 @@ package ru.phestrix.service;
 
 import ru.phestrix.dto.CustomerDto;
 import ru.phestrix.dtoProducer.CustomerDtoProducer;
-import ru.phestrix.storage.databaseConnection.DatabaseConnection;
 import ru.phestrix.storage.entity.Customer;
 import ru.phestrix.storage.repositories.CustomerRepository;
 import ru.phestrix.storage.repositories.ProductRepository;
 import ru.phestrix.storage.repositories.PurchaseRepository;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
