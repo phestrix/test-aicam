@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SearchService {
-    private final Connection connection = DatabaseConnection.getConnection();
     private final CustomerRepository customerRepository = new CustomerRepository();
     private final ProductRepository productRepository = new ProductRepository();
     private final PurchaseRepository purchaseRepository = new PurchaseRepository();
@@ -22,7 +21,7 @@ public class SearchService {
     public ArrayList<CustomerDto> searchByLastname(String surname) {
         ArrayList<CustomerDto> customerDtos = new ArrayList<>();
         if (!surname.isEmpty()) {
-            List<Customer> customerList = customerRepository.findBySurname(surname);
+            List<Customer> customerList = customerRepository.findByLastName(surname);
             if (customerList.isEmpty()) {
                 return null;
             }
