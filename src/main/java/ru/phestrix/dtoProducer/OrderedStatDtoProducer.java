@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class OrderedStatDtoProducer {
     public static ArrayList<OrderedStatDto> makeOrderedStatDtos(ArrayList<StatDto> statDtos) {

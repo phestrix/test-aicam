@@ -3,12 +3,9 @@ package ru.phestrix.service;
 import ru.phestrix.dto.OrderedStatDto;
 import ru.phestrix.dto.StatDto;
 import ru.phestrix.dtoProducer.OrderedStatDtoProducer;
-import ru.phestrix.storage.databaseConnection.DatabaseConnection;
-import ru.phestrix.storage.entity.Customer;
 import ru.phestrix.storage.repositories.CustomerRepository;
 import ru.phestrix.storage.repositories.PurchaseRepository;
 
-import java.sql.Connection;
 import java.sql.Date;
 import java.time.Period;
 import java.util.ArrayList;

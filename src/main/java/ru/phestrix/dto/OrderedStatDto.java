@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 @AllArgsConstructor
 @Getter
@@ -16,7 +15,6 @@ import java.util.Map;
 public class OrderedStatDto {
     private String fullName;
     private ArrayList<String> productNames = new ArrayList<>();
-    ;
     private ArrayList<Integer> expenses = new ArrayList<>();
     private Integer totalExpenses = 0;
 
