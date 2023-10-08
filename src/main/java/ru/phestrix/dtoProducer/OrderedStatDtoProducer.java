@@ -4,8 +4,10 @@ import ru.phestrix.dto.OrderedStatDto;
 import ru.phestrix.dto.StatDto;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class OrderedStatDtoProducer {
     public static ArrayList<OrderedStatDto> makeOrderedStatDtos(ArrayList<StatDto> statDtos) {
@@ -27,7 +29,7 @@ public class OrderedStatDtoProducer {
                 list.add(tmp);
             }
         }
-
+        list.sort(Comparator.comparing(OrderedStatDto::getTotalExpenses).reversed());
         return list;
     }
 }

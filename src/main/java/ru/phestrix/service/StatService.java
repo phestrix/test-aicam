@@ -24,20 +24,11 @@ public class StatService {
 
     public ArrayList<OrderedStatDto> stat(Date startDate, Date endDate) {
         ArrayList<StatDto> statDtos = purchaseRepository.getStatistic(startDate, endDate);
-        for (StatDto dto : statDtos) {
-            totalExpenses = getTotalExpensesByCustomer(
-                    customerRepository.findByFullName(dto.getFullName())
-            );
-        }
+        totalExpenses = purchaseRepository.findTotalExpenses();
         avgExpenses = getAverageExpenses();
         totalDays = Math.abs(Period.between(startDate.toLocalDate(), endDate.toLocalDate()).getDays()) + 1;
 
         return OrderedStatDtoProducer.makeOrderedStatDtos(sortByCustomer(statDtos));
-    }
-
-    private Integer getTotalExpensesByCustomer(Customer customer) {
-        purchaseRepository.findTotalExpensesByCustomer(customer.getId());
-        return purchaseRepository.findTotalExpensesByCustomer(customer.getId());
     }
 
     private Double getAverageExpenses() {

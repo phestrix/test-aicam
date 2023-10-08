@@ -96,16 +96,15 @@ public class PurchaseRepository {
         return customerIdArray;
     }
 
-    public Integer findTotalExpensesByCustomer(Integer customerId) {
+    public Integer findTotalExpenses() {
         Integer total = 0;
         try {
             PreparedStatement statement = connection.prepareStatement(
                     "select sum(p.price) from customer c " +
                             "join purchase pu on c.id = pu.customer_id " +
-                            "join product p on pu.product_id = p.id " +
-                            "where c.id = ?"
+                            "join product p on pu.product_id = p.id "
             );
-            statement.setInt(1, customerId);
+
             ResultSet resultSet = statement.executeQuery();
             resultSet.next();
             total = resultSet.getInt("sum");
@@ -143,7 +142,7 @@ public class PurchaseRepository {
             PreparedStatement statement = connection.prepareStatement(
                     "select c.surname || ' ' || c.name as fullName, p.name as productName, " +
                             "count(sub.product_id) * p.price as expenses from " +
-                            "(select * from purchase where date between ? and ? and extract(dow from (5,6))" +
+                            "(select * from purchase where date between ? and ? " +
                             "and customer_id in (select id from customer) order by product_id) as sub " +
                             "join product p on sub.product_id = p.id join customer c on sub.customer_id = c.id " +
                             "group by p.name, p.price, sub.customer_id, c.name, c.surname, sub.product_id " +
