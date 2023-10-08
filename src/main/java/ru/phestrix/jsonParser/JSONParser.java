@@ -3,6 +3,7 @@ package ru.phestrix.jsonParser;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import ru.phestrix.dto.CustomerDto;
+import ru.phestrix.dto.OrderedStatDto;
 import ru.phestrix.jsonParser.utility.CriteriaType;
 
 import java.io.FileWriter;
@@ -139,9 +140,11 @@ public class JSONParser {
         results.put(result);
     }
 
-    public void write() {
+    public void write(String type) {
         try {
-            finalObject.put("results", results);
+            if (type.equals("search"))
+                finalObject.put("results", results);
+            else finalObject.put("customers", results);
             outputWriter.write(finalObject.toString());
         } catch (IOException e) {
             e.printStackTrace();
@@ -151,6 +154,25 @@ public class JSONParser {
     public void closeWriter() {
         try {
             outputWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //using this for stat because of sorting in json object that placing name after purchase
+    public void writeStatistic(
+            ArrayList<OrderedStatDto> list,
+            Integer totalDays,
+            Integer totalExpenses,
+            Double avgExpenses) {
+        String str = "{\n"
+                + "\t\"type\": \"stat\""
+                + "\t\"totalDays\": " + totalDays +
+                "\t\"customers\":" + list.toString()
+                + ",\n\t\"totalExpenses\": " + totalExpenses + ",\n" +
+                "\t\"averageExpenses\": " + avgExpenses + "\n}";
+        try {
+            outputWriter.write(str);
         } catch (IOException e) {
             e.printStackTrace();
         }
