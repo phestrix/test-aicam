@@ -1,0 +1,70 @@
+{
+  "type": "search",
+  "results": [
+    {
+      "criteria": {
+        "lastName": "Иванов"
+      }
+    },
+    {
+      "results": [
+        {
+          "lastName": "Иванов",
+          "firstName": "Иван"
+        },
+        {
+          "lastName": "Иванов",
+          "firstName": "Никита"
+        }
+      ]
+    },
+    {
+      "criteria": {
+        "minTimes": 5,
+        "productName": "Вода"
+      }
+    },
+    {
+      "results": []
+    },
+    {
+      "criteria": {
+        "minExpenses": 112,
+        "maxExpenses": 4000
+      }
+    },
+    {
+      "results": [
+        {
+          "lastName": "Иванов",
+          "firstName": "Никита"
+        },
+        {
+          "lastName": "Иванов",
+          "firstName": "Иван"
+        }
+      ]
+    },
+    {
+      "criteria": {
+        "badCustomers": 3
+      }
+    },
+    {
+      "results": [
+        {
+          "lastName": "Прохоров",
+          "firstName": "Сергей"
+        },
+        {
+          "lastName": "Иванов",
+          "firstName": "Никита"
+        },
+        {
+          "lastName": "Иванов",
+          "firstName": "Иван"
+        }
+      ]
+    }
+  ]
+}
