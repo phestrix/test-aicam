@@ -128,6 +128,12 @@ public class JSONParser {
     }
 
     public void writeDtoList(ArrayList<CustomerDto> list) {
+        JSONObject result = new JSONObject();
+        if (list == null) {
+            result.put("results", "Ничего не нашлось");
+            results.put(result);
+            return;
+        }
         JSONArray array = new JSONArray();
         for (CustomerDto customerDto : list) {
             JSONObject object = new JSONObject();
@@ -135,7 +141,6 @@ public class JSONParser {
             object.put("firstName", customerDto.getName());
             array.put(object);
         }
-        JSONObject result = new JSONObject();
         result.put("results", array);
         results.put(result);
     }
