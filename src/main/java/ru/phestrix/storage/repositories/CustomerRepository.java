@@ -100,9 +100,9 @@ public class CustomerRepository {
     }
 
     public Customer findByFullName(String fullName) {
-        Customer customer = new Customer();
-        String name = fullName.substring(0, fullName.indexOf(" "));
-        String lastName = fullName.substring(fullName.indexOf(" "));
+        Customer customer = null;
+        String lastName = fullName.substring(0, fullName.indexOf(" "));
+        String name = fullName.substring(fullName.indexOf(" ") + 1);
         try {
             PreparedStatement statement = connection.prepareStatement(
                     "select * from customer where customer.name = ? and customer.surname = ?"
@@ -110,10 +110,12 @@ public class CustomerRepository {
             statement.setString(1, name);
             statement.setString(2, lastName);
             ResultSet resultSet = statement.executeQuery();
-            resultSet.next();
-            customer.setId(resultSet.getInt("id"));
-            customer.setName(resultSet.getString("name"));
-            customer.setSurname(resultSet.getString("surname"));
+            if (resultSet.next())
+                customer = new Customer(
+                        resultSet.getInt("id"),
+                        resultSet.getString("name"),
+                        resultSet.getString("surname")
+                );
             resultSet.close();
         } catch (SQLException e) {
             e.printStackTrace();
