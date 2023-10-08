@@ -1,6 +1,8 @@
 package ru.phestrix.service;
 
+import ru.phestrix.dto.OrderedStatDto;
 import ru.phestrix.dto.StatDto;
+import ru.phestrix.dtoProducer.OrderedStatDtoProducer;
 import ru.phestrix.storage.databaseConnection.DatabaseConnection;
 import ru.phestrix.storage.entity.Customer;
 import ru.phestrix.storage.repositories.CustomerRepository;
@@ -20,7 +22,7 @@ public class StatService {
     private Integer totalExpenses = 0;
     private Integer totalDays = 0;
 
-    public ArrayList<StatDto> stat(Date startDate, Date endDate) {
+    public ArrayList<OrderedStatDto> stat(Date startDate, Date endDate) {
         ArrayList<StatDto> statDtos = purchaseRepository.getStatistic(startDate, endDate);
         for (StatDto dto : statDtos) {
             totalExpenses = getTotalExpensesByCustomer(
@@ -29,7 +31,8 @@ public class StatService {
         }
         avgExpenses = getAverageExpenses();
         totalDays = Math.abs(Period.between(startDate.toLocalDate(), endDate.toLocalDate()).getDays()) + 1;
-        return sortByCustomer(statDtos);
+
+        return OrderedStatDtoProducer.makeOrderedStatDtos(sortByCustomer(statDtos));
     }
 
     private Integer getTotalExpensesByCustomer(Customer customer) {
