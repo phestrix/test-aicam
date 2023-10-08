@@ -1,0 +1,48 @@
+{
+	"type": "stat"	"totalDays": 6	"customers":[{
+name: "Иванов Никита",
+purchases: [
+{
+name: "Хлеб",
+expenses: 25
+},
+{
+name: "Колбаса",
+expenses: 100
+},
+{
+name: "Крупа",
+expenses: 160
+},
+],
+totalExpenses: 285
+}, {
+name: "Иванов Иван",
+purchases: [
+{
+name: "Вода",
+expenses: 20
+},
+{
+name: "Хлеб",
+expenses: 25
+},
+{
+name: "Колбаса",
+expenses: 200
+},
+],
+totalExpenses: 245
+}, {
+name: "Прохоров Сергей",
+purchases: [
+{
+name: "Вода",
+expenses: 20
+},
+],
+totalExpenses: 20
+}],
+	"totalExpenses": 550,
+	"averageExpenses": 71.25
+}
